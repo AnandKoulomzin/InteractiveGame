@@ -9,9 +9,13 @@ public class Cubefield implements Runnable, KeyListener{
 
     final int WIDTH = 1000;
     final int HEIGHT = 700;
+    public JFrame frame;
     public Canvas canvas;
     public JPanel panel;
     public BufferStrategy bufferStrategy;
+    public Arrow user;
+    public Image arrowPic;
+
 
     public static void main(String[] args) {
         Cubefield myApp = new Cubefield();
@@ -22,10 +26,16 @@ public class Cubefield implements Runnable, KeyListener{
         setUpGraphics();
 
         canvas.addKeyListener(this);
+
+        arrowPic = Toolkit.getDefaultToolkit().getImage("Arrow.png");
+
+        user = new Arrow(500, 600, 5, 5, arrowPic);
+
+
     }
 
     public void moveThings () {
-
+        user.move();
     }
 
     public void checkIntersections () {
@@ -33,10 +43,22 @@ public class Cubefield implements Runnable, KeyListener{
     }
 
     public void run () {
-
+        while (true) {
+            moveThings();           //move all the game objects
+            checkIntersections();   // check character crashes
+            render();               // paint the graphics
+            pause(20);         // sleep for 20 ms
+        }
     }
 
     public void render () {
+        Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
+        g.clearRect(0, 0, WIDTH, HEIGHT);
+
+        g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
+
+        g.dispose();
+        bufferStrategy.show();
 
 
     }
@@ -47,16 +69,11 @@ public class Cubefield implements Runnable, KeyListener{
         System.out.println("Key Pressed: " + key + "  Code: " + keyCode);
 
         if (keyCode == 68) {
-
+            user.right=true;
         }
-        if (keyCode == 83) {
 
-        }
         if (keyCode == 65) {
-
-        }
-        if(keyCode == 87){
-
+            user.left=true;
         }
     }
     public void keyReleased(KeyEvent event) {
@@ -64,18 +81,12 @@ public class Cubefield implements Runnable, KeyListener{
         int keyCode = event.getKeyCode();
 
         if (keyCode == 68) {
-
+            user.right=false;
         }
-        if (keyCode == 83) {
 
-        }
         if (keyCode == 65) {
-
+            user.left=false;
         }
-        if(keyCode == 87){
-
-        }
-
     }
 
     public void keyTyped(KeyEvent event) {
@@ -83,12 +94,34 @@ public class Cubefield implements Runnable, KeyListener{
     }
 
     public void setUpGraphics() {
+        frame = new JFrame("Cubefield");
+
+        panel = (JPanel) frame.getContentPane();
+        panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        panel.setLayout(null);
+
+        canvas = new Canvas();
+        canvas.setBounds(0, 0, WIDTH, HEIGHT);
+        canvas.setIgnoreRepaint(true);
+
+        panel.add(canvas);
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setResizable(false);
+        frame.setVisible(true);
+
+        canvas.createBufferStrategy(2);
+        bufferStrategy = canvas.getBufferStrategy();
+        canvas.requestFocus();
+        System.out.println("DONE graphic setup");
 
     }
 
     public void pause(int time) {
-
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+        }
     }
-
-
 }
