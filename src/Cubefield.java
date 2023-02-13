@@ -15,7 +15,8 @@ public class Cubefield implements Runnable, KeyListener{
     public BufferStrategy bufferStrategy;
     public Arrow user;
     public Image arrowPic;
-
+    public Image squaresPic;
+    public Square[] squares;
 
     public static void main(String[] args) {
         Cubefield myApp = new Cubefield();
@@ -28,9 +29,13 @@ public class Cubefield implements Runnable, KeyListener{
         canvas.addKeyListener(this);
 
         arrowPic = Toolkit.getDefaultToolkit().getImage("Arrow.png");
+        squaresPic = Toolkit.getDefaultToolkit().getImage("redsquare.png");
 
         user = new Arrow(500, 600, 5, 5, arrowPic);
-
+        squares = new Square[5];
+        for(int x = 0;x < 5; x++){
+            squares[x] = new Square (x*100+100,400,3,3, squaresPic);
+        }
 
     }
 
@@ -56,6 +61,9 @@ public class Cubefield implements Runnable, KeyListener{
         g.clearRect(0, 0, WIDTH, HEIGHT);
 
         g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
+        for (int x=0; x<5; x++) {
+            g.drawImage(squares[x].pic, squares[x].xpos, squares[x].ypos, squares[x].width, squares[x].height, null);
+        }
 
         g.dispose();
         bufferStrategy.show();
