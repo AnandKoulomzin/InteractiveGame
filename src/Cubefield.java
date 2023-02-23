@@ -17,10 +17,16 @@ public class Cubefield implements Runnable, KeyListener{
     public Image arrowPic;
     public Image squaresPic;
     public Square[] squares;
+    public boolean isAlive;
+    public int timer;
+    public boolean first;
+    public boolean gameStart=false;
 
     public static void main(String[] args) {
         Cubefield myApp = new Cubefield();
         new Thread(myApp).start();
+
+
     }
 
     public Cubefield() {
@@ -29,45 +35,85 @@ public class Cubefield implements Runnable, KeyListener{
         canvas.addKeyListener(this);
 
         arrowPic = Toolkit.getDefaultToolkit().getImage("Arrow.png");
-        squaresPic = Toolkit.getDefaultToolkit().getImage("redsquare.png");
+        squaresPic = Toolkit.getDefaultToolkit().getImage("orangesquare.png");
 
         user = new Arrow(500, 600, 5, 5, arrowPic);
-        squares = new Square[5];
-        for(int x = 0;x < 5; x++){
-            squares[x] = new Square (x*100+100,400,3,3, squaresPic);
+        squares = new Square[10];
+        for(int x = 0;x < 10; x++){
+            squares[x] = new Square (x*100+35,40,50,50, squaresPic);
         }
 
+    }
+
+    public void chooseSquares(){
+        for (int x = 0; x < 10; x++) {
+            if(squares[x].isAlive==false){
+                double r=Math.random();
+                if(r<0.7){
+                    System.out.println("test");
+                    squares[x].isAlive=true;
+                }
+            }
+        }
     }
 
     public void moveThings () {
         user.move();
+        for (int x = 0; x < squares.length; x++){
+            if( squares[x].isAlive==true){
+                squares[x].move();
+            }
+        }
     }
 
+
+
     public void checkIntersections () {
-        
+        for (int x = 0; x < 10; x++) {
+            if (user.rec.intersects(squares[x].rec)) {
+                user.isAlive = false;
+            }
+        }
     }
 
     public void run () {
-        while (true) {
-            moveThings();           //move all the game objects
-            checkIntersections();   // check character crashes
-            render();               // paint the graphics
-            pause(20);         // sleep for 20 ms
-        }
+
+            while (true) {
+                if (gameStart == true) {
+                    chooseSquares();
+                    moveThings();
+                    checkIntersections();
+                }
+                render();
+                pause(20);
+            }
     }
 
     public void render () {
         Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
         g.clearRect(0, 0, WIDTH, HEIGHT);
 
-        g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
-        for (int x=0; x<5; x++) {
-            g.drawImage(squares[x].pic, squares[x].xpos, squares[x].ypos, squares[x].width, squares[x].height, null);
+        if (gameStart == false){
+            //draw start screen
+            g.setColor(Color.WHITE);
+            g.fillRect(0,0,WIDTH,HEIGHT);
+            g.setColor(Color.BLACK);
+            g.drawString("Press enter to start", 300,250);
         }
 
-        g.dispose();
-        bufferStrategy.show();
+        else {
 
+            if (user.isAlive == true) {
+                g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
+            }
+
+            for (int x = 0; x < 10; x++) {
+                g.drawImage(squares[x].pic, squares[x].xpos, squares[x].ypos, squares[x].width, squares[x].height, null);
+            }
+        }
+
+        bufferStrategy.show();
+        g.dispose();
 
     }
 
@@ -76,13 +122,19 @@ public class Cubefield implements Runnable, KeyListener{
         int keyCode = event.getKeyCode();
         System.out.println("Key Pressed: " + key + "  Code: " + keyCode);
 
-        if (keyCode == 68) {
+        if (keyCode == 10 && gameStart == false) {  //return key is starting the game
+            gameStart=true;
+        }
+
+        if (keyCode == 68) {  // d makes the arrow go right
             user.right=true;
         }
 
-        if (keyCode == 65) {
+        if (keyCode == 65) {  // a makes the arrow go left
             user.left=true;
         }
+
+
     }
     public void keyReleased(KeyEvent event) {
         char key = event.getKeyChar();

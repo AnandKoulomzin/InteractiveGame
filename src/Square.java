@@ -16,6 +16,7 @@ public class Square {
         ypos = pYpos;
         dx = dxParameter;
         dy = dyParameter;
+        pic = picParameter;
         width = 50;
         height = 50;
         dx = 5;
@@ -23,18 +24,12 @@ public class Square {
         isAlive = true;
         rec = new Rectangle(xpos, ypos, width, height);
 
-
     }
     public void move() {
-        xpos = xpos + dx;
-        ypos = ypos + dy;
-
-        if (xpos > 1000 - width || xpos < 0) {
-            dx = -dx;
-        }
-
-        if (ypos < 0 || ypos + height > 700) {
-            dy = -dy;
+        ypos = ypos - dy;
+        if (ypos + height > 700) {
+            ypos=-10;
+            isAlive=false;
         }
 
         rec = new Rectangle(xpos, ypos, width, height);
