@@ -9,6 +9,8 @@ public class Square {
     public int dy;                    //the speed of the hero in the y direction
     public Rectangle rec;
     public Image pic;
+    public boolean first;
+    public boolean hasChosen;
 
     public Square(int pXpos, int pYpos, int dxParameter, int dyParameter, Image picParameter) {
 
@@ -29,8 +31,14 @@ public class Square {
         ypos = ypos - dy;
         if (ypos + height > 700) {
             ypos=-10;
-            isAlive=false;
+            System.out.println("changing isAlive to false");
+            isAlive = false;
+            hasChosen=false;
         }
+
+//        if(ypos==5 && isAlive == true){
+//            isAlive=false;
+//        }
 
         rec = new Rectangle(xpos, ypos, width, height);
 

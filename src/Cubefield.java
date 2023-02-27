@@ -19,8 +19,10 @@ public class Cubefield implements Runnable, KeyListener{
     public Square[] squares;
     public boolean isAlive;
     public int timer;
-    public boolean first;
+    public boolean second;
     public boolean gameStart=false;
+    public boolean hasChosen = false;
+
 
     public static void main(String[] args) {
         Cubefield myApp = new Cubefield();
@@ -46,22 +48,33 @@ public class Cubefield implements Runnable, KeyListener{
     }
 
     public void chooseSquares(){
-        for (int x = 0; x < 10; x++) {
-            if(squares[x].isAlive==false){
-                double r=Math.random();
-                if(r<0.7){
-                    System.out.println("test");
-                    squares[x].isAlive=true;
+
+        if (hasChosen == false) {
+            for (int x = 0; x < squares.length; x++) {
+          //      System.out.println("squares[x].isAlive is " + squares[x].isAlive);
+                if (squares[x].isAlive == false) {
+                    System.out.println("choosing square?");
+                    double r = Math.random();
+                    if (r < 0.7) {
+                        System.out.println("test");
+                        squares[x].isAlive = true;
+                    }
                 }
             }
-        }
+        }hasChosen = true;
+        System.out.println("has chosen is: " + hasChosen);
     }
 
     public void moveThings () {
         user.move();
+
         for (int x = 0; x < squares.length; x++){
             if( squares[x].isAlive==true){
                 squares[x].move();
+                if (squares[x].ypos + squares[x].height > 650) {
+                    hasChosen = false;
+                    System.out.println("has chosen is: " + hasChosen);
+                }
             }
         }
     }
@@ -108,7 +121,9 @@ public class Cubefield implements Runnable, KeyListener{
             }
 
             for (int x = 0; x < 10; x++) {
-                g.drawImage(squares[x].pic, squares[x].xpos, squares[x].ypos, squares[x].width, squares[x].height, null);
+                if (squares[x].isAlive == true) {
+                    g.drawImage(squares[x].pic, squares[x].xpos, squares[x].ypos, squares[x].width, squares[x].height, null);
+                }
             }
         }
 
