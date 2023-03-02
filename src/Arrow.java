@@ -36,9 +36,9 @@ public class Arrow {
         ypos = ypos + dy;
 
         if(right == true) {
-            dx = 10;
+            dx = 13;
         } else if (left == true){
-            dx = -10;
+            dx = -13;
         } else {
             dx=0;
         }

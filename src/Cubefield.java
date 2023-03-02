@@ -22,7 +22,11 @@ public class Cubefield implements Runnable, KeyListener{
     public boolean second;
     public boolean gameStart=false;
     public boolean hasChosen = false;
+    public int levelCounter = 0;
+    public boolean finished  = false;
 
+    public void endScreen () {
+    }
 
     public static void main(String[] args) {
         Cubefield myApp = new Cubefield();
@@ -41,15 +45,25 @@ public class Cubefield implements Runnable, KeyListener{
 
         user = new Arrow(500, 600, 5, 5, arrowPic);
         squares = new Square[10];
-        for(int x = 0;x < 10; x++){
-            squares[x] = new Square (x*100+35,40,50,50, squaresPic);
-        }
+
+        makeSquares();
+        chooseSquares2();
 
     }
 
+    public void makeSquares() {
+        for(int x = 0; x < squares.length; x++){
+            squares[x] = new Square (x*100+35,40, squaresPic);
+        }
+        levelCounter++;
+        System.out.println("level" + levelCounter);
+    }
+
+
+
     public void chooseSquares(){
 
-        if (hasChosen == false) {
+//        if (hasChosen == false) {
             for (int x = 0; x < squares.length; x++) {
           //      System.out.println("squares[x].isAlive is " + squares[x].isAlive);
                 if (squares[x].isAlive == false) {
@@ -61,21 +75,39 @@ public class Cubefield implements Runnable, KeyListener{
                     }
                 }
             }
-        }hasChosen = true;
-        System.out.println("has chosen is: " + hasChosen);
+//        }
+//        hasChosen = true;
+//        System.out.println("has chosen is: " + hasChosen);
+    }
+
+    public void chooseSquares2() {
+        int squareCounter = 0;
+        for (int x = 0; x < squares.length; x++) {
+            double r = Math.random();
+            if (r < 0.9 && squareCounter < 9) {
+             //   System.out.println("test");
+                squares[x].isAlive = true;
+                squareCounter++;
+            }
+        }
     }
 
     public void moveThings () {
         user.move();
 
         for (int x = 0; x < squares.length; x++){
-            if( squares[x].isAlive==true){
+            if( squares[x].isAlive == true) {
                 squares[x].move();
-                if (squares[x].ypos + squares[x].height > 650) {
-                    hasChosen = false;
-                    System.out.println("has chosen is: " + hasChosen);
-                }
             }
+
+            if (squares[x].ypos > 700) {
+//                hasChosen = false;
+//                System.out.println("has chosen is: " + hasChosen);
+                makeSquares();
+                chooseSquares2();
+                break;
+            }
+
         }
     }
 
@@ -92,8 +124,8 @@ public class Cubefield implements Runnable, KeyListener{
     public void run () {
 
             while (true) {
-                if (gameStart == true) {
-                    chooseSquares();
+                if (gameStart == true && finished==false) {
+             //       chooseSquares();
                     moveThings();
                     checkIntersections();
                 }
@@ -127,6 +159,16 @@ public class Cubefield implements Runnable, KeyListener{
             }
         }
 
+        if (user.isAlive == false) {
+            g.setColor(Color.WHITE);
+            g.fillRect(0,0,WIDTH,HEIGHT);
+            g.setColor(Color.BLACK);
+            g.drawString("you lose L. Score:" + levelCounter, 500,400);
+            finished=true;
+
+
+        }
+
         bufferStrategy.show();
         g.dispose();
 
@@ -135,7 +177,7 @@ public class Cubefield implements Runnable, KeyListener{
     public void keyPressed(KeyEvent event) {
         char key = event.getKeyChar();
         int keyCode = event.getKeyCode();
-        System.out.println("Key Pressed: " + key + "  Code: " + keyCode);
+       // System.out.println("Key Pressed: " + key + "  Code: " + keyCode);
 
         if (keyCode == 10 && gameStart == false) {  //return key is starting the game
             gameStart=true;
