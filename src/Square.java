@@ -35,18 +35,6 @@ public class Square {
     public void move() {
         ypos = ypos - dy;
 
-
-//        if (ypos + height > 700) {
-//            ypos=-10;
-//            System.out.println("changing isAlive to false");
-//            isAlive = false;
-//            hasChosen=false;
-//        }
-
-//        if(ypos==5 && isAlive == true){
-//            isAlive=false;
-//        }
-
         rec = new Rectangle(xpos, ypos, width, height);
 
     }

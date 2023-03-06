@@ -171,9 +171,25 @@ public class Cubefield implements Runnable, KeyListener{
             g.setFont(new Font("TimesRoman", Font.PLAIN , 25));
             g.drawString("you lose. L", 350,240);
             g.setFont(new Font("TimesRoman", Font.BOLD , 25));
-            g.drawString("Score: " + levelCounter, 350, 280);
+            if (levelCounter < 4){
+                g.drawString("Yikes.", 470, 280);
+            }
+            if (levelCounter > 3 && levelCounter < 8){
+                g.drawString("Not bad.", 470, 280);
+            }
+            if (levelCounter > 7 && levelCounter < 12){
+                g.drawString("Average", 470, 280);
+            }
+            if (levelCounter > 11 && levelCounter < 18){
+                g.drawString("Ok, that was really good.", 470, 280);
+            }
+            if (levelCounter > 17){
+                g.drawString("HOW??? You broke my best score.", 470, 280);
+            }
+
+                g.drawString("Score: " + levelCounter + ".", 350, 280);
             g.setFont(new Font("TimesRoman", Font.PLAIN , 25));
-            g.drawString("hold the space bar to play again", 350, 320);
+            g.drawString("press the spacebar to play again", 350, 320);
             finished=true;
 
         }
@@ -200,11 +216,16 @@ public class Cubefield implements Runnable, KeyListener{
             user.left = true;
         }
         if (keyCode == 32) {
-            finished = false;
+            for (int x = 0; x < squares.length; x++) {
+                squares[x].dy=-6;
+                squares[x].ypos=40;
+            }
             user.isAlive = true;
             user.ypos = 600;
             levelCounter = 0;
             user.xpos = 500;
+            stopCounter=0;
+            finished = false;
         }
         if (keyCode == 16 && stopCounter < 3) {
             stopping = true;
@@ -224,11 +245,17 @@ public class Cubefield implements Runnable, KeyListener{
             user.left=false;
         }
         if (keyCode == 32) {
-            finished=false;
-            user.isAlive=true;
-            levelCounter=0;
-            user.xpos=500;
-            stopCounter=0;
+//            user.isAlive = true;
+//            user.ypos = 600;
+//            levelCounter = 0;
+//            user.xpos = 500;
+//            stopCounter=0;
+//            for (int x = 0; x < squares.length; x++) {
+//                squares[x].dy=-6;
+//                squares[x].ypos=600;
+//            }
+//            finished = false;
+
         }
     }
 
