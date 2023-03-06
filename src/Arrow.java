@@ -14,6 +14,8 @@ public class Arrow {
     public boolean down;
     public boolean left;
     public boolean up;
+    public int levelCounter;
+    public int arrowSpeed;
 
     public Arrow(int pXpos, int pYpos, int dxParameter, int dyParameter, Image picParameter) {
 
@@ -33,12 +35,11 @@ public class Arrow {
     public void move() {
 
         xpos = xpos + dx;
-        ypos = ypos + dy;
 
         if(right == true) {
-            dx = 13;
+            dx = 14;
         } else if (left == true){
-            dx = -13;
+            dx = -14;
         } else {
             dx=0;
         }

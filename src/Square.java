@@ -23,7 +23,7 @@ public class Square {
         width = 50;
         height = 50;
         dx = 0;
-        dy = -9;
+        dy = -6;
 
         isAlive = false;
         rec = new Rectangle(xpos, ypos, width, height);

@@ -1,6 +1,7 @@
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 import java.awt.*;
+import javax.sound.sampled.Line;
 import javax.swing.*;
 
 import java.awt.event.*;
@@ -20,13 +21,14 @@ public class Cubefield implements Runnable, KeyListener{
     public boolean isAlive;
     public int timer;
     public boolean second;
-    public boolean gameStart=false;
+    public boolean gameStart = false;
     public boolean hasChosen = false;
     public int levelCounter = 0;
     public boolean finished  = false;
+    public int stopTimer;
+    public boolean stopping=false;
+    public int stopCounter = 0;
 
-    public void endScreen () {
-    }
 
     public static void main(String[] args) {
         Cubefield myApp = new Cubefield();
@@ -52,33 +54,18 @@ public class Cubefield implements Runnable, KeyListener{
     }
 
     public void makeSquares() {
-        for(int x = 0; x < squares.length; x++){
-            squares[x] = new Square (x*100+35,40, squaresPic);
+        for (int x = 0; x < squares.length; x++) {
+            squares[x] = new Square(x * 100 + 35, 40, squaresPic);
         }
         levelCounter++;
-        System.out.println("level" + levelCounter);
+        System.out.println("level " + levelCounter);
+        for (int x = 0; x < squares.length; x++) {
+            squares[x].dy=squares[x].dy-levelCounter/2;
+        }
+        user.ypos=user.ypos-levelCounter*2;
+        System.out.println(user.ypos);
     }
 
-
-
-    public void chooseSquares(){
-
-//        if (hasChosen == false) {
-            for (int x = 0; x < squares.length; x++) {
-          //      System.out.println("squares[x].isAlive is " + squares[x].isAlive);
-                if (squares[x].isAlive == false) {
-                    System.out.println("choosing square?");
-                    double r = Math.random();
-                    if (r < 0.7) {
-                        System.out.println("test");
-                        squares[x].isAlive = true;
-                    }
-                }
-            }
-//        }
-//        hasChosen = true;
-//        System.out.println("has chosen is: " + hasChosen);
-    }
 
     public void chooseSquares2() {
         int squareCounter = 0;
@@ -92,12 +79,25 @@ public class Cubefield implements Runnable, KeyListener{
         }
     }
 
+    public void setStopTimer () {
+        if (stopping == true) {
+            stopTimer++;
+        }
+        if (stopTimer > 30) {
+            stopping = false;
+            stopTimer = 0;
+        }
+    }
+
     public void moveThings () {
         user.move();
 
         for (int x = 0; x < squares.length; x++){
             if( squares[x].isAlive == true) {
-                squares[x].move();
+
+                if (stopping == false) {
+                    squares[x].move();
+                }
             }
 
             if (squares[x].ypos > 700) {
@@ -125,12 +125,13 @@ public class Cubefield implements Runnable, KeyListener{
 
             while (true) {
                 if (gameStart == true && finished==false) {
-             //       chooseSquares();
+                    setStopTimer();
                     moveThings();
                     checkIntersections();
                 }
-                render();
-                pause(20);
+                    render();
+                    pause(20);
+
             }
     }
 
@@ -150,22 +151,30 @@ public class Cubefield implements Runnable, KeyListener{
 
             if (user.isAlive == true) {
                 g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
-            }
 
-            for (int x = 0; x < 10; x++) {
-                if (squares[x].isAlive == true) {
-                    g.drawImage(squares[x].pic, squares[x].xpos, squares[x].ypos, squares[x].width, squares[x].height, null);
+
+                for (int x = 0; x < 10; x++) {
+                    if (squares[x].isAlive == true) {
+                        g.drawImage(squares[x].pic, squares[x].xpos, squares[x].ypos, squares[x].width, squares[x].height, null);
+                    }
                 }
             }
         }
+
+        g.drawString("Score: " + levelCounter, 20, 20);
+        g.drawString("Stops used: " + stopCounter + "/3", 900, 20);
 
         if (user.isAlive == false) {
             g.setColor(Color.WHITE);
             g.fillRect(0,0,WIDTH,HEIGHT);
             g.setColor(Color.BLACK);
-            g.drawString("you lose L. Score:" + levelCounter, 500,400);
+            g.setFont(new Font("TimesRoman", Font.PLAIN , 25));
+            g.drawString("you lose. L", 350,240);
+            g.setFont(new Font("TimesRoman", Font.BOLD , 25));
+            g.drawString("Score: " + levelCounter, 350, 280);
+            g.setFont(new Font("TimesRoman", Font.PLAIN , 25));
+            g.drawString("hold the space bar to play again", 350, 320);
             finished=true;
-
 
         }
 
@@ -177,21 +186,31 @@ public class Cubefield implements Runnable, KeyListener{
     public void keyPressed(KeyEvent event) {
         char key = event.getKeyChar();
         int keyCode = event.getKeyCode();
-       // System.out.println("Key Pressed: " + key + "  Code: " + keyCode);
+        // System.out.println("Key Pressed: " + key + "  Code: " + keyCode);
 
-        if (keyCode == 10 && gameStart == false) {  //return key is starting the game
-            gameStart=true;
+        if (keyCode == 10 && gameStart == false) {  //enter starts the game
+            gameStart = true;
         }
 
         if (keyCode == 68) {  // d makes the arrow go right
-            user.right=true;
+            user.right = true;
         }
 
         if (keyCode == 65) {  // a makes the arrow go left
-            user.left=true;
+            user.left = true;
         }
-
-
+        if (keyCode == 32) {
+            finished = false;
+            user.isAlive = true;
+            user.ypos = 600;
+            levelCounter = 0;
+            user.xpos = 500;
+        }
+        if (keyCode == 16 && stopCounter < 3) {
+            stopping = true;
+            stopCounter++;
+            System.out.println(stopCounter);
+        }
     }
     public void keyReleased(KeyEvent event) {
         char key = event.getKeyChar();
@@ -203,6 +222,13 @@ public class Cubefield implements Runnable, KeyListener{
 
         if (keyCode == 65) {
             user.left=false;
+        }
+        if (keyCode == 32) {
+            finished=false;
+            user.isAlive=true;
+            levelCounter=0;
+            user.xpos=500;
+            stopCounter=0;
         }
     }
 
