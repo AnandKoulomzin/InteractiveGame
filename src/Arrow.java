@@ -32,7 +32,7 @@ public class Arrow {
     }
 
 
-    public void move() {
+    public void move() {  //the arrow can only move horizantally
 
         xpos = xpos + dx;
 

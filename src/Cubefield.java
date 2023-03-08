@@ -1,7 +1,6 @@
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 import java.awt.*;
-import javax.sound.sampled.Line;
 import javax.swing.*;
 
 import java.awt.event.*;
@@ -28,6 +27,8 @@ public class Cubefield implements Runnable, KeyListener{
     public int stopTimer;
     public boolean stopping=false;
     public int stopCounter = 0;
+    public SoundFile beep;
+    public SoundFile powerUp;
 
 
     public static void main(String[] args) {
@@ -47,25 +48,32 @@ public class Cubefield implements Runnable, KeyListener{
 
         user = new Arrow(500, 600, 5, 5, arrowPic);
         squares = new Square[10];
+        beep = new SoundFile ("beepsound.wav");
+        powerUp = new SoundFile ("powerup.wav");
 
         makeSquares();
         chooseSquares2();
 
     }
 
+//this is when the squares get created
+    //this method also increases the levelCounter
+
     public void makeSquares() {
         for (int x = 0; x < squares.length; x++) {
             squares[x] = new Square(x * 100 + 35, 40, squaresPic);
         }
         levelCounter++;
-        System.out.println("level " + levelCounter);
-        for (int x = 0; x < squares.length; x++) {
+
+        for (int x = 0; x < squares.length; x++) { //the squares get faster every time the player completes a level
             squares[x].dy=squares[x].dy-levelCounter/2;
         }
-        user.ypos=user.ypos-levelCounter*2;
-        System.out.println(user.ypos);
+
+        user.ypos=user.ypos-levelCounter*2; //the arrow gets higher each time a level is completely, further reducing reaction time
+        powerUp.play();
     }
 
+//this method decides how many squares get created.
 
     public void chooseSquares2() {
         int squareCounter = 0;
@@ -79,6 +87,8 @@ public class Cubefield implements Runnable, KeyListener{
         }
     }
 
+    //this method decides how long the stop lasts when you press right shift. it activates a boolean that disables/enables squares' movement
+
     public void setStopTimer () {
         if (stopping == true) {
             stopTimer++;
@@ -88,6 +98,8 @@ public class Cubefield implements Runnable, KeyListener{
             stopTimer = 0;
         }
     }
+
+    //moves all objects
 
     public void moveThings () {
         user.move();
@@ -111,7 +123,7 @@ public class Cubefield implements Runnable, KeyListener{
         }
     }
 
-
+//this method makes it so that the arrow dies when it intersects a square
 
     public void checkIntersections () {
         for (int x = 0; x < 10; x++) {
@@ -122,6 +134,8 @@ public class Cubefield implements Runnable, KeyListener{
     }
 
     public void run () {
+
+//the game only runs after the start screen and before the end screen is activated
 
             while (true) {
                 if (gameStart == true && finished==false) {
@@ -139,6 +153,8 @@ public class Cubefield implements Runnable, KeyListener{
         Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
         g.clearRect(0, 0, WIDTH, HEIGHT);
 
+        //this creates the start screen so that the game doesn't start immediately
+
         if (gameStart == false){
             //draw start screen
             g.setColor(Color.WHITE);
@@ -148,6 +164,8 @@ public class Cubefield implements Runnable, KeyListener{
         }
 
         else {
+
+//renders the squares and arrow
 
             if (user.isAlive == true) {
                 g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
@@ -160,16 +178,19 @@ public class Cubefield implements Runnable, KeyListener{
                 }
             }
         }
+//these strings tell the player their score and how many stops they've used
 
         g.drawString("Score: " + levelCounter, 20, 20);
         g.drawString("Stops used: " + stopCounter + "/3", 900, 20);
+
+        //when the arrow dies, the game is over and the end screen is triggered
 
         if (user.isAlive == false) {
             g.setColor(Color.WHITE);
             g.fillRect(0,0,WIDTH,HEIGHT);
             g.setColor(Color.BLACK);
             g.setFont(new Font("TimesRoman", Font.PLAIN , 25));
-            g.drawString("you lose. L", 350,240);
+            g.drawString("you lose.", 350,240);
             g.setFont(new Font("TimesRoman", Font.BOLD , 25));
             if (levelCounter < 4){
                 g.drawString("Yikes.", 470, 280);
@@ -190,6 +211,7 @@ public class Cubefield implements Runnable, KeyListener{
                 g.drawString("Score: " + levelCounter + ".", 350, 280);
             g.setFont(new Font("TimesRoman", Font.PLAIN , 25));
             g.drawString("press the spacebar to play again", 350, 320);
+            //when the player presses the spacebar, the boolean that turns off the game is un-triggered and a new round begins
             finished=true;
 
         }
@@ -215,48 +237,38 @@ public class Cubefield implements Runnable, KeyListener{
         if (keyCode == 65) {  // a makes the arrow go left
             user.left = true;
         }
-        if (keyCode == 32) {
+        if (keyCode == 32) {  //spacebar resets the game
             for (int x = 0; x < squares.length; x++) {
+                //resets the squares' position
                 squares[x].dy=-6;
                 squares[x].ypos=40;
             }
-            user.isAlive = true;
-            user.ypos = 600;
-            levelCounter = 0;
-            user.xpos = 500;
-            stopCounter=0;
-            finished = false;
+            user.isAlive = true; //revives the arrow
+            user.ypos = 600; //resets the ypos of the arrow
+            levelCounter = 0; //resets the player's score
+            user.xpos = 500; //resets the xpos of the arrow
+            stopCounter=0; //resets the number of stops used by the player
+            finished = false; //new round begins
         }
-        if (keyCode == 16 && stopCounter < 3) {
+        if (keyCode == 16 && stopCounter < 3) { //when the player presses right shift the squares stop momentarily
+            beep.play();
             stopping = true;
             stopCounter++;
-            System.out.println(stopCounter);
+            //System.out.println(stopCounter);
         }
     }
     public void keyReleased(KeyEvent event) {
         char key = event.getKeyChar();
         int keyCode = event.getKeyCode();
 
-        if (keyCode == 68) {
+        if (keyCode == 68) {  // d makes the arrow go right
             user.right=false;
         }
 
-        if (keyCode == 65) {
+        if (keyCode == 65) { // a makes the arrow go left
             user.left=false;
         }
-        if (keyCode == 32) {
-//            user.isAlive = true;
-//            user.ypos = 600;
-//            levelCounter = 0;
-//            user.xpos = 500;
-//            stopCounter=0;
-//            for (int x = 0; x < squares.length; x++) {
-//                squares[x].dy=-6;
-//                squares[x].ypos=600;
-//            }
-//            finished = false;
 
-        }
     }
 
     public void keyTyped(KeyEvent event) {

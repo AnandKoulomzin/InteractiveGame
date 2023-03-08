@@ -31,7 +31,7 @@ public class Square {
     }
 
 
-
+//the squares only move down
     public void move() {
         ypos = ypos - dy;
 
